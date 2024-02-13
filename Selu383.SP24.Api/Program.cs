@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Selu383.SP24.Api.Data;
 using Selu383.SP24.Api.Features.Hotels;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
