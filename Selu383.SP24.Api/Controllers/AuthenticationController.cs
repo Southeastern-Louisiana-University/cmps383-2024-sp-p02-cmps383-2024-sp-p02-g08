@@ -21,21 +21,25 @@ namespace Selu383.SP24.Api.Controllers
         [HttpPost("test")]
         public async Task<IActionResult> IndexAsync()
         {
-            User user = new User
+            User user1 = new User
             {
-                Id = 1,
                 Email = "test@gmail.com",
-                UserName = "Test"
+                UserName = "galkadi"
             };
 
-            var result = await userManager.CreateAsync(user, "Password123");
+            var result = await userManager.CreateAsync(user1, "Password123");
 
             await roles.CreateAsync(new Role
             {
                 Name = "Admin",
             });
 
-            await userManager.AddToRoleAsync(user, "admin");
+            await roles.CreateAsync(new Role
+            {
+                Name = "User",
+            });
+
+            await userManager.AddToRoleAsync(user1, "Admin");
 
             return Ok();
         }
