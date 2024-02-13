@@ -12,7 +12,7 @@ using Selu383.SP24.Api.Data;
 namespace Selu383.SP24.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240213022520_AuthenticationMigration")]
+    [Migration("20240213182428_AuthenticationMigration")]
     partial class AuthenticationMigration
     {
         /// <inheritdoc />

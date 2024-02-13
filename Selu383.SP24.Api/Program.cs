@@ -1,12 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Selu383.SP24.Api.Data;
+using Selu383.SP24.Api.Features;
 using Selu383.SP24.Api.Features.Hotels;
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataContext")));
+
+builder.Services.AddIdentity<User, Role>().AddEntityFrameworkStores<DataContext>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -30,11 +34,17 @@ using (var scope = app.Services.CreateScope())
                 .Add(new Hotel
                 {
                     Name = "Hammond " + i,
-                    Address = "1234 Place st"
-                });
+                    Address = "1234 Place st",
+                }) ;
         }
 
         await db.SaveChangesAsync();
+    }
+
+    var users = db.Set<User>();
+    if (!await users.AnyAsync())
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     }
 }
 

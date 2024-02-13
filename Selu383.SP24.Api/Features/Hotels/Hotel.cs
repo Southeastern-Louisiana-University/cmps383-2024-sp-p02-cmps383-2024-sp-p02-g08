@@ -1,4 +1,6 @@
-﻿namespace Selu383.SP24.Api.Features.Hotels;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Selu383.SP24.Api.Features.Hotels;
 
 public class Hotel
 {
