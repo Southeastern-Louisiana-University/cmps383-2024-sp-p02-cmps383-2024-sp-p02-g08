@@ -77,7 +77,7 @@ using (var scope = app.Services.CreateScope())
         });
 
 
-        roleManager.CreateAsync(new Role
+        await roleManager.CreateAsync(new Role
         {
             Name = "User"
         });
