@@ -42,10 +42,53 @@ using (var scope = app.Services.CreateScope())
     }
 
     var users = db.Set<User>();
+
     if (!await users.AnyAsync())
     {
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+
+        User user1 = new User
+        {
+            Email = "test@gmail.com",
+            UserName = "galkadi"
+        };
+
+        User user2 = new User
+        {
+            Email = "test1@gmail.com",
+            UserName = "bob"
+        };
+
+        User user3 = new User
+        {
+            Email = "test2@gmail.com",
+            UserName = "sue"
+        };
+
+        await userManager.CreateAsync(user1, "Password123!");
+        await userManager.CreateAsync(user2, "Password123!");
+        await userManager.CreateAsync(user3, "Password123!");
+
+
+        await roleManager.CreateAsync(new Role
+        {
+            Name = "Admin"
+        });
+
+
+        roleManager.CreateAsync(new Role
+        {
+            Name = "User"
+        });
+
+        await userManager.AddToRoleAsync(user1, "Admin");
+        await userManager.AddToRoleAsync(user2, "User");
+        await userManager.AddToRoleAsync(user3, "User");
+
+        await db.SaveChangesAsync();
     }
+
 }
 
 // Configure the HTTP request pipeline.

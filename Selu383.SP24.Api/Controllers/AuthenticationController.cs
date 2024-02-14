@@ -25,7 +25,7 @@ namespace Selu383.SP24.Api.Controllers
             this.signInManager = signInManager;
         }
 
-        [HttpPost("login")]
+        [HttpPost("/api/authentication/login")]
         public async Task<ActionResult> LoginAsync(LoginDto model)
         {
             if (!ModelState.IsValid)
@@ -62,33 +62,27 @@ namespace Selu383.SP24.Api.Controllers
             return Ok("secret");
         }
 
-
-        [HttpPost("test")]
-        public async Task<IActionResult> IndexAsync()
+        [HttpGet("/api/authentication/me")]
+        public async Task<ActionResult<UserDto>> GetAuthenticatedUser()
         {
-            User user1 = new User
+            if (!User.Identity.IsAuthenticated)
             {
-                Email = "test@gmail.com",
-                UserName = "galkadi"
+                return Unauthorized();
+            }
+
+            var userName = User.Identity.Name;
+
+            var user = await userManager.FindByNameAsync(userName);
+            var roles = await userManager.GetRolesAsync(user);
+
+            var userDto = new UserDto
+            {
+                UserName = user.UserName,
+                Roles = roles.ToArray()
             };
 
-            var result = await userManager.CreateAsync(user1, "Password123!");
-
-            await roles.CreateAsync(new Role
-            {
-                Name = "Admin",
-            });
-
-            await roles.CreateAsync(new Role
-            {
-                Name = "User",
-            });
-
-            await userManager.AddToRoleAsync(user1, "Admin");
-
-            return Ok();
+            return Ok(userDto);
         }
-
 
     }
 }
