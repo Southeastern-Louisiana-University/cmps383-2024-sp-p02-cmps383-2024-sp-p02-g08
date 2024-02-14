@@ -12,7 +12,7 @@ using Selu383.SP24.Api.Data;
 namespace Selu383.SP24.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240213194133_AuthenticationMigration")]
+    [Migration("20240213231319_AuthenticationMigration")]
     partial class AuthenticationMigration
     {
         /// <inheritdoc />
@@ -111,6 +111,33 @@ namespace Selu383.SP24.Api.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Selu383.SP24.Api.Features.Hotels.Hotel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManagerId");
+
+                    b.ToTable("Hotel");
                 });
 
             modelBuilder.Entity("Selu383.SP24.Api.Features.Role", b =>
@@ -260,6 +287,15 @@ namespace Selu383.SP24.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Selu383.SP24.Api.Features.Hotels.Hotel", b =>
+                {
+                    b.HasOne("Selu383.SP24.Api.Features.User", "Manager")
+                        .WithMany()
+                        .HasForeignKey("ManagerId");
+
+                    b.Navigation("Manager");
                 });
 
             modelBuilder.Entity("Selu383.SP24.Api.Features.UserRole", b =>

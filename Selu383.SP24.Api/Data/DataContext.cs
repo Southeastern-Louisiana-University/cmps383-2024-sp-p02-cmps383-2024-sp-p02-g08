@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Selu383.SP24.Api.Features;
+using System.Reflection.Emit;
 
 namespace Selu383.SP24.Api.Data;
 
@@ -22,7 +23,7 @@ public class DataContext : IdentityDbContext<User, Role, int, IdentityUserClaim<
 
         var userRoleBuilder = builder.Entity<UserRole>();
 
-        userRoleBuilder.HasKey(x => new {x.UserId, x.RoleId});
+        userRoleBuilder.HasKey(x => new { x.UserId, x.RoleId });
 
         userRoleBuilder.HasOne(x => x.Role).
             WithMany(x => x.Users).
@@ -31,6 +32,8 @@ public class DataContext : IdentityDbContext<User, Role, int, IdentityUserClaim<
         userRoleBuilder.HasOne(x => x.User)
             .WithMany(x => x.Roles)
             .HasForeignKey(x => x.UserId);
+
+        builder.ApplyConfigurationsFromAssembly(typeof(DataContext).Assembly);
 
     }
 }

@@ -11,8 +11,11 @@ namespace Selu383.SP24.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Hotel");
+            migrationBuilder.AddColumn<int>(
+                name: "ManagerId",
+                table: "Hotel",
+                type: "int",
+                nullable: true);
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
@@ -162,6 +165,11 @@ namespace Selu383.SP24.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Hotel_ManagerId",
+                table: "Hotel",
+                column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -199,11 +207,22 @@ namespace Selu383.SP24.Api.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Hotel_AspNetUsers_ManagerId",
+                table: "Hotel",
+                column: "ManagerId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Hotel_AspNetUsers_ManagerId",
+                table: "Hotel");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -225,19 +244,13 @@ namespace Selu383.SP24.Api.Migrations
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
-            migrationBuilder.CreateTable(
-                name: "Hotel",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Hotel", x => x.Id);
-                });
+            migrationBuilder.DropIndex(
+                name: "IX_Hotel_ManagerId",
+                table: "Hotel");
+
+            migrationBuilder.DropColumn(
+                name: "ManagerId",
+                table: "Hotel");
         }
     }
 }
