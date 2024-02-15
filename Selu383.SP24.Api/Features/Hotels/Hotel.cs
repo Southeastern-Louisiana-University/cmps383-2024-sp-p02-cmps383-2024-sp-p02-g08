@@ -11,4 +11,7 @@ public class Hotel
     public string Address { get; set; }
 
     public User? Manager { get; set; }
+
+    public int? ManagerId { get; set; }
+
 }

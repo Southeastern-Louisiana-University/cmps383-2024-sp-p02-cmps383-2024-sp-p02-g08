@@ -107,6 +107,8 @@ app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
+    app.UseSwaggerUI();
     app.UseSpa(x =>
     {
         x.UseProxyToSpaDevelopmentServer("http://localhost:5173");

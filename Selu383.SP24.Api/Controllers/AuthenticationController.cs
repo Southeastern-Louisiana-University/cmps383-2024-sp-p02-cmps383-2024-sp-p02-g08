@@ -26,7 +26,7 @@ namespace Selu383.SP24.Api.Controllers
         }
 
         [HttpPost("/api/authentication/login")]
-        public async Task<ActionResult> LoginAsync(LoginDto model)
+        public async Task<ActionResult> LoginAsync([FromBody]LoginDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -36,24 +36,34 @@ namespace Selu383.SP24.Api.Controllers
             var user = await userManager.FindByNameAsync(model.UserName);
             if (user == null)
             {
-                return Unauthorized("Invalid username or password");
+                return BadRequest("Invalid username or password");
             }
 
             var result = await signInManager.PasswordSignInAsync(user, model.Password, true, true);
             if (!result.Succeeded)
             {
-                return Unauthorized("Invalid username or password");
+                return BadRequest("Invalid username or password");
             }
 
             var roles = await userManager.GetRolesAsync(user);
             var userDto = new UserDto
             {
+                Id = user.Id,
                 UserName = user.UserName,
                 Roles = roles.ToArray()
             };
 
             return Ok(userDto);
         }
+
+        [HttpPost("/api/authentication/logout")]
+        public async Task<ActionResult> LogoutAsync()
+        {
+            await signInManager.SignOutAsync();
+
+            return Ok("Logged out successfully");
+        }
+
 
         [HttpGet("secret")]
         [Authorize(Roles = "Admin")]
@@ -77,6 +87,7 @@ namespace Selu383.SP24.Api.Controllers
 
             var userDto = new UserDto
             {
+                Id = user.Id,
                 UserName = user.UserName,
                 Roles = roles.ToArray()
             };

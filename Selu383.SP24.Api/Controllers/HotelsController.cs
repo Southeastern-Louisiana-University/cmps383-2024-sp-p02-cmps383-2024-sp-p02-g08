@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Selu383.SP24.Api.Data;
 using Selu383.SP24.Api.Features.Hotels;
+using Selu383.SP24.Api.Features;
+using System.Security.Claims;
 
 namespace Selu383.SP24.Api.Controllers;
 
@@ -40,6 +43,11 @@ public class HotelsController : ControllerBase
     [HttpPost]
     public ActionResult<HotelDto> CreateHotel(HotelDto dto)
     {
+        if (!User.Identity.IsAuthenticated)
+        {
+            return Unauthorized();
+        }
+
         if (IsInvalid(dto))
         {
             return BadRequest();
@@ -49,6 +57,8 @@ public class HotelsController : ControllerBase
         {
             Name = dto.Name,
             Address = dto.Address,
+            Manager = dataContext.Users.FirstOrDefault(x => x.Id == dto.ManagerId)
+
         };
         hotels.Add(hotel);
 
@@ -61,6 +71,7 @@ public class HotelsController : ControllerBase
 
     [HttpPut]
     [Route("{id}")]
+    [Authorize]
     public ActionResult<HotelDto> UpdateHotel(int id, HotelDto dto)
     {
         if (IsInvalid(dto))
@@ -74,8 +85,18 @@ public class HotelsController : ControllerBase
             return NotFound();
         }
 
+        if (!User.IsInRole("Admin") && GetUserId(User) != hotel.ManagerId)
+        {
+            return Forbid();
+        }
+
         hotel.Name = dto.Name;
         hotel.Address = dto.Address;
+
+        if (User.IsInRole("Admin"))
+        {
+            hotel.ManagerId = dto.ManagerId;
+        }
 
         dataContext.SaveChanges();
 
@@ -86,8 +107,14 @@ public class HotelsController : ControllerBase
 
     [HttpDelete]
     [Route("{id}")]
-    public ActionResult DeleteHotel(int id)
+    [Authorize(Roles = "Admin")]
+    public ActionResult DeleteHotel([FromBody]int id)
     {
+        if (!User.Identity.IsAuthenticated)
+        {
+            return Forbid();
+        }
+
         var hotel = hotels.FirstOrDefault(x => x.Id == id);
         if (hotel == null)
         {
@@ -116,6 +143,20 @@ public class HotelsController : ControllerBase
                 Id = x.Id,
                 Name = x.Name,
                 Address = x.Address,
+                ManagerId = x.Manager.Id
             });
     }
+
+    private int? GetUserId(ClaimsPrincipal claimsPrincipal)
+    {
+        var userId = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userId == null)
+        {
+            return null;
+        }
+
+        return int.Parse(userId);
+    }
+
 }
